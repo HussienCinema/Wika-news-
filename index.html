@@ -8,27 +8,30 @@
     <meta name="theme-color" content="#e74c3c">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #e74c3c; --bg: #0f0f0f; --card-bg: #1a1a1a; --text-main: #ffffff; --text-dim: #b3b3b3; --glass: rgba(255, 255, 255, 0.05); }
-        body { font-family: 'Cairo', sans-serif; background-color: var(--bg); color: var(--text-main); margin: 0; padding: 0; overflow-x: hidden; }
-        header { background: rgba(15, 15, 15, 0.95); backdrop-filter: blur(10px); padding: 12px 0; text-align: center; border-bottom: 1px solid var(--glass); position: sticky; top: 0; z-index: 1000; }
-        .logo-img { height: 40px; }
-        .breaking-news-container { padding: 12px; }
-        .breaking-card { background: linear-gradient(135deg, var(--primary), #c0392b); border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.3); }
-        .breaking-badge { background: #fff; color: var(--primary); padding: 4px 12px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; white-space: nowrap; }
-        #breaking-text { font-weight: 700; font-size: 0.95rem; line-height: 1.4; transition: opacity 0.3s; flex-grow: 1; }
-        nav { background: var(--card-bg); display: flex; padding: 10px; gap: 8px; overflow-x: auto; scrollbar-width: none; position: sticky; top: 65px; z-index: 999; border-bottom: 1px solid var(--glass); }
+        :root { --primary: #e74c3c; --bg: #0f0f0f; --card: #1a1a1a; --text: #ffffff; --dim: #b3b3b3; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; line-height: 1.6; }
+        
+        header { background: rgba(15, 15, 15, 0.9); backdrop-filter: blur(10px); padding: 15px; text-align: center; border-bottom: 2px solid var(--primary); position: sticky; top: 0; z-index: 1000; }
+        .logo-img { height: 45px; }
+
+        .breaking-box { background: #fff; color: #000; margin: 15px; border-radius: 12px; border-right: 8px solid var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.3); overflow: hidden; }
+        .breaking-label { background: var(--primary); color: #fff; padding: 4px 15px; font-weight: bold; font-size: 0.85rem; width: fit-content; border-radius: 0 0 10px 0; }
+        #ticker-text { padding: 12px; font-weight: bold; font-size: 1.05rem; transition: opacity 0.4s; min-height: 1.5em; }
+
+        nav { background: #222; display: flex; overflow-x: auto; padding: 10px; gap: 8px; border-bottom: 1px solid #333; position: sticky; top: 77px; z-index: 999; }
         nav::-webkit-scrollbar { display: none; }
-        nav button { background: var(--glass); color: var(--text-dim); border: none; padding: 8px 18px; border-radius: 20px; cursor: pointer; font-weight: bold; white-space: nowrap; font-family: inherit; }
-        nav button.active { background: var(--primary); color: white; }
-        .container { max-width: 1000px; margin: 10px auto; padding: 0 12px; }
-        .news-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
-        .news-card { background: var(--card-bg); border-radius: 15px; overflow: hidden; text-decoration: none; color: inherit; transition: 0.3s; border: 1px solid var(--glass); display: flex; flex-direction: column; }
-        .news-image { width: 100%; height: 170px; object-fit: cover; background: #252525; }
-        .news-body { padding: 15px; flex-grow: 1; }
-        .news-title { font-size: 1.05rem; font-weight: 700; line-height: 1.5; margin-bottom: 10px; color: #fff; }
-        .news-footer { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-dim); border-top: 1px solid var(--glass); padding-top: 10px; }
-        #loader { text-align: center; padding: 50px; color: var(--primary); font-weight: bold; }
-        .retry-btn { display: none; margin: 20px auto; padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer; }
+        nav button { background: #333; color: #fff; border: none; padding: 8px 20px; border-radius: 20px; cursor: pointer; white-space: nowrap; font-weight: bold; font-family: inherit; }
+        nav button.active { background: var(--primary); }
+
+        .container { padding: 15px; max-width: 800px; margin: auto; }
+        .news-card { background: var(--card); border-radius: 15px; margin-bottom: 15px; display: block; border-right: 5px solid var(--primary); text-decoration: none; color: inherit; transition: 0.2s; border-top: 1px solid rgba(255,255,255,0.05); }
+        .news-card:active { transform: scale(0.98); background: #222; }
+        .news-body { padding: 18px; }
+        .news-title { font-size: 1.15rem; font-weight: bold; color: #fff; margin: 0; line-height: 1.5; }
+        .news-footer { font-size: 0.85rem; color: var(--dim); margin-top: 12px; display: flex; justify-content: space-between; align-items: center; }
+
+        #status { text-align: center; padding: 40px; color: var(--primary); font-weight: bold; font-size: 1.2rem; }
+        .load-more { display: none; width: 100%; padding: 15px; background: var(--primary); color: #fff; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin: 20px 0; font-family: inherit; }
     </style>
 </head>
 <body>
@@ -37,123 +40,120 @@
     <img src="Picsart_26-01-20_05-35-29-021.png" alt="Wika News" class="logo-img">
 </header>
 
-<div class="breaking-news-container">
-    <div class="breaking-card">
-        <span class="breaking-badge">عاجل</span>
-        <div id="breaking-text">جاري جلب المستجدات...</div>
-    </div>
+<div class="breaking-box">
+    <div class="breaking-label">عاجل</div>
+    <div id="ticker-text">جاري جلب آخر الأخبار...</div>
 </div>
 
 <nav>
-    <button class="active" onclick="changeCategory('all', this)">الرئيسية</button>
-    <button onclick="changeCategory('politics', this)">سياسة</button>
-    <button onclick="changeCategory('sports', this)">رياضة</button>
-    <button onclick="changeCategory('economy', this)">اقتصاد</button>
+    <button class="active" onclick="changeCat('all', this)">الرئيسية</button>
+    <button onclick="changeCat('politics', this)">سياسة</button>
+    <button onclick="changeCat('sports', this)">رياضة</button>
+    <button onclick="changeCat('economy', this)">اقتصاد</button>
 </nav>
 
 <div class="container">
-    <div id="news-container" class="news-grid"></div>
-    <div id="loader">جاري تحميل الأخبار...</div>
-    <button id="retry-btn" class="retry-btn" onclick="location.reload()">إعادة تحميل الصفحة</button>
+    <div id="news-list"></div>
+    <div id="status">جاري التحميل...</div>
+    <button id="more-btn" class="load-more" onclick="render()">عرض المزيد من الأخبار</button>
 </div>
 
 <script>
-    let allPosts = [];
-    let breakingIndex = 0;
-    const proxyUrl = "https://api.allorigins.win/get?url=";
-    const rssSource = "https://www.ina.iq/rss.xml";
+    let posts = [];
+    let count = 0;
+    const step = 10;
+    let tickerIdx = 0;
 
-    async function fetchNews(category = 'all') {
-        const container = document.getElementById('news-container');
-        const loader = document.getElementById('loader');
-        const retryBtn = document.getElementById('retry-btn');
+    const proxy = "https://api.allorigins.win/get?url=";
+    const rss = "https://www.ina.iq/rss.xml";
+
+    async function load(cat = 'all') {
+        const list = document.getElementById('news-list');
+        const status = document.getElementById('status');
+        const btn = document.getElementById('more-btn');
         
-        container.innerHTML = '';
-        loader.style.display = 'block';
-        retryBtn.style.display = 'none';
-        
+        list.innerHTML = '';
+        status.style.display = 'block';
+        status.innerText = "جاري عرض الأخبار المتاحة...";
+        btn.style.display = 'none';
+
         try {
-            const response = await fetch(`${proxyUrl}${encodeURIComponent(rssSource)}&t=${Date.now()}`);
-            if (!response.ok) throw new Error();
-            const data = await response.json();
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(data.contents, "text/xml");
-            const items = Array.from(xmlDoc.querySelectorAll("item"));
+            const res = await fetch(`${proxy}${encodeURIComponent(rss)}&t=${Date.now()}`);
+            const data = await res.json();
+            const xml = new DOMParser().parseFromString(data.contents, "text/xml");
+            const items = xml.querySelectorAll("item");
 
-            allPosts = items.map(item => {
+            posts = [];
+            items.forEach(item => {
                 const title = item.querySelector("title").textContent;
                 const link = item.querySelector("link").textContent;
-                const desc = item.querySelector("description") ? item.querySelector("description").textContent : "";
                 
-                // استخراج صورة افتراضية ذكية إذا لم توجد صورة للخبر
-                const imgMatch = desc.match(/<img[^>]+src="([^">]+)"/);
-                const image = imgMatch ? imgMatch[1] : "https://www.ina.iq/assets/img/logo_ina.png";
-
-                return { title, link, image };
+                if (cat === 'all') {
+                    posts.push({ title, link });
+                } else {
+                    const keys = {
+                        politics: ['سياس', 'حكوم', 'مجلس', 'وزير'],
+                        sports: ['رياض', 'كرة', 'منتخب', 'نادي'],
+                        economy: ['اقتصاد', 'مال', 'دولار', 'سعر']
+                    };
+                    if (keys[cat].some(k => title.includes(k))) posts.push({ title, link });
+                }
             });
 
-            if (category !== 'all') {
-                const keywords = {
-                    politics: ['سياس', 'حكوم', 'مجلس', 'وزير', 'برلمان'],
-                    sports: ['رياض', 'كرة', 'منتخب', 'نادي', 'مباراة'],
-                    economy: ['اقتصاد', 'مال', 'دولار', 'دينار', 'سعر']
-                };
-                allPosts = allPosts.filter(p => keywords[category].some(k => p.title.includes(k)));
-            }
-
-            loader.style.display = 'none';
-            renderNews();
-            if(category === 'all') startBreaking();
+            status.style.display = 'none';
+            count = 0;
+            render();
+            if(cat === 'all') startTicker();
         } catch (e) {
-            loader.innerText = "حدث خطأ في الاتصال بالمصدر.";
-            retryBtn.style.display = 'block';
+            status.innerText = "جاري عرض الأخبار المتاحة...";
         }
     }
 
-    function renderNews() {
-        const container = document.getElementById('news-container');
-        if (allPosts.length === 0) {
-            container.innerHTML = "<p style='text-align:center; width:100%;'>لا توجد أخبار في هذا القسم حالياً.</p>";
-            return;
-        }
-        allPosts.forEach(post => {
-            container.innerHTML += `
-                <a href="${post.link}" target="_blank" class="news-card">
-                    <img src="${post.image}" class="news-image" onerror="this.src='https://www.ina.iq/assets/img/logo_ina.png'">
+    function render() {
+        const list = document.getElementById('news-list');
+        const btn = document.getElementById('more-btn');
+        const chunk = posts.slice(count, count + step);
+        
+        chunk.forEach(p => {
+            list.innerHTML += `
+                <a href="${p.link}" target="_blank" class="news-card">
                     <div class="news-body">
-                        <h3 class="news-title">${post.title}</h3>
+                        <h3 class="news-title">${p.title}</h3>
                         <div class="news-footer">
-                            <span>🕒 وكالة واع</span>
-                            <span>التفاصيل ←</span>
+                            <span style="color:var(--primary); font-weight:700;">🕒 وكالة واع</span>
+                            <span>تفاصيل الخبر ←</span>
                         </div>
                     </div>
                 </a>
             `;
         });
+
+        count += step;
+        btn.style.display = count < posts.length ? 'block' : 'none';
     }
 
-    function startBreaking() {
-        const text = document.getElementById('breaking-text');
-        if (allPosts.length === 0) return;
-        text.innerText = allPosts[0].title;
+    function startTicker() {
+        const el = document.getElementById('ticker-text');
+        if(!posts.length) return;
+        el.innerText = posts[0].title;
         if(window.timer) clearInterval(window.timer);
         window.timer = setInterval(() => {
-            text.style.opacity = 0;
+            el.style.opacity = 0;
             setTimeout(() => {
-                breakingIndex = (breakingIndex + 1) % Math.min(allPosts.length, 10);
-                text.innerText = allPosts[breakingIndex].title;
-                text.style.opacity = 1;
-            }, 300);
-        }, 5000);
+                tickerIdx = (tickerIdx + 1) % Math.min(posts.length, 12);
+                el.innerText = posts[tickerIdx].title;
+                el.style.opacity = 1;
+            }, 400);
+        }, 6000);
     }
 
-    function changeCategory(cat, btn) {
+    function changeCat(cat, btn) {
         document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        fetchNews(cat);
+        load(cat);
     }
 
-    fetchNews();
+    load();
 </script>
 </body>
 </html>
