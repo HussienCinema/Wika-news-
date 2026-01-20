@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wika News | ويكا نيوز</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#e74c3c">
+    <style>
+        :root { --primary: #e74c3c; --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; line-height: 1.6; }
+        header { background: var(--bg); padding: 15px; text-align: center; border-bottom: 2px solid var(--primary); position: sticky; top: 0; z-index: 1000; }
+        .logo-img { height: 55px; }
+        
+        .breaking-card { background: #fff; color: #000; margin: 15px; border-radius: 12px; display: flex; flex-direction: column; box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3); min-height: 95px; border-right: 8px solid var(--primary); }
+        .breaking-header { background: var(--primary); color: #fff; padding: 5px 20px; font-weight: bold; font-size: 0.9rem; width: fit-content; border-radius: 0 0 10px 0; }
+        #breaking-content { padding: 10px 15px; font-weight: 600; font-size: 1.1rem; transition: opacity 0.5s ease; }
+
+        nav { background: #252525; display: flex; overflow-x: auto; padding: 12px; gap: 10px; border-bottom: 1px solid #333; scrollbar-width: none; }
+        nav::-webkit-scrollbar { display: none; }
+        nav button { background: #333; color: #fff; border: none; padding: 10px 22px; border-radius: 25px; cursor: pointer; white-space: nowrap; font-weight: bold; transition: 0.3s; }
+        nav button.active { background: var(--primary); }
+
+        .container { padding: 15px; max-width: 850px; margin: auto; }
+        .news-card { background: var(--card); border-radius: 15px; margin-bottom: 20px; display: block; border-right: 6px solid var(--primary); text-decoration: none; color: inherit; transition: 0.3s; }
+        .news-content { padding: 20px; }
+        .news-title { font-size: 1.25rem; font-weight: bold; margin: 0; color: #fff; line-height: 1.6; }
+        .news-meta { font-size: 0.85rem; color: #aaa; margin-top: 15px; display: flex; justify-content: space-between; align-items: center; }
+
+        .load-more-container { text-align: center; margin: 30px 0; }
+        .load-more-btn { display: inline-block; padding: 15px 45px; background: var(--primary); color: #fff; border: none; border-radius: 35px; cursor: pointer; font-weight: bold; font-size: 1.1rem; }
+        #loading-text { text-align: center; padding: 40px; color: var(--primary); font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="Picsart_26-01-20_05-35-29-021.png" alt="Wika News" class="logo-img">
+</header>
+
+<div class="breaking-card">
+    <div class="breaking-header">عاجل</div>
+    <div id="breaking-content">جاري جلب آخر الأخبار...</div>
+</div>
+
+<nav>
+    <button class="active" onclick="changeCategory('all', this)">الكل</button>
+    <button onclick="changeCategory('politics', this)">سياسة</button>
+    <button onclick="changeCategory('sports', this)">رياضة</button>
+    <button onclick="changeCategory('economy', this)">اقتصاد</button>
+    <button onclick="changeCategory('local', this)">محليات</button>
+</nav>
+
+<div class="container">
+    <div id="news-container"></div>
+    <div id="loading-text">جاري التحميل...</div>
+    <div class="load-more-container">
+        <button id="load-more" class="load-more-btn" style="display: none;" onclick="renderNews()">👇 عرض المزيد من الأخبار</button>
+    </div>
+</div>
+
+<script>
+    let allPosts = [];
+    let displayedCount = 0;
+    const increment = 10;
+    let breakingIndex = 0;
+
+    // محرك AllOrigins القوي لتجاوز مشاكل "المصادر مشغولة"
+    const proxyUrl = "https://api.allorigins.win/get?url=";
+    
+    const sources = {
+        all: "https://www.ina.iq/rss.xml",
+        politics: "https://www.shafaq.com/ar/rss/1",
+        sports: "https://www.alsumaria.tv/rss/3",
+        economy: "https://www.shafaq.com/ar/rss/3",
+        local: "https://alrabiaa.tv/rss"
+    };
+
+    async function fetchNews(category = 'all') {
+        const container = document.getElementById('news-container');
+        const loader = document.getElementById('loading-text');
+        const loadMoreBtn = document.getElementById('load-more');
+        
+        container.innerHTML = '';
+        loader.style.display = 'block';
+        loadMoreBtn.style.display = 'none';
+        
+        try {
+            // سحب البيانات الخام ثم تحويلها إلى XML
+            const response = await fetch(`${proxyUrl}${encodeURIComponent(sources[category])}`);
+            const data = await response.json();
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(data.contents, "text/xml");
+            const items = xmlDoc.querySelectorAll("item");
+
+            allPosts = [];
+            items.forEach(item => {
+                allPosts.push({
+                    title: item.querySelector("title").textContent,
+                    link: item.querySelector("link").textContent,
+                    pubDate: item.querySelector("pubDate").textContent
+                });
+            });
+
+            if (allPosts.length > 0) {
+                displayedCount = 0;
+                loader.style.display = 'none';
+                renderNews();
+                if(category === 'all') startBreakingTicker();
+            } else {
+                throw new Error();
+            }
+        } catch (e) {
+            loader.innerText = "فشل التحميل، يرجى المحاولة لاحقاً.";
+        }
+    }
+
+    function renderNews() {
+        const container = document.getElementById('news-container');
+        const loadMoreBtn = document.getElementById('load-more');
+        const nextBatch = allPosts.slice(displayedCount, displayedCount + increment);
+        
+        nextBatch.forEach(post => {
+            const card = document.createElement('a');
+            card.className = 'news-card';
+            card.href = post.link;
+            card.target = '_blank';
+            card.innerHTML = `
+                <div class="news-content">
+                    <h3 class="news-title">${post.title}</h3>
+                    <div class="news-meta">
+                        <span>🕒 ${post.pubDate.split(' ')[4] || ''}</span>
+                        <span>تفاصيل الخبر ←</span>
+                    </div>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+        displayedCount += increment;
+        loadMoreBtn.style.display = (allPosts.length > displayedCount) ? 'inline-block' : 'none';
+    }
+
+    function startBreakingTicker() {
+        const breakingContent = document.getElementById('breaking-content');
+        if (allPosts.length === 0) return;
+        
+        breakingContent.innerText = allPosts[0].title;
+        if(window.tickerInterval) clearInterval(window.tickerInterval);
+        window.tickerInterval = setInterval(() => {
+            breakingContent.style.opacity = 0;
+            setTimeout(() => {
+                breakingIndex = (breakingIndex + 1) % Math.min(allPosts.length, 12);
+                breakingContent.innerText = allPosts[breakingIndex].title;
+                breakingContent.style.opacity = 1;
+            }, 500);
+        }, 6500);
+    }
+
+    function changeCategory(cat, btn) {
+        document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        fetchNews(cat);
+    }
+
+    fetchNews();
+</script>
+
+</body>
+</html>

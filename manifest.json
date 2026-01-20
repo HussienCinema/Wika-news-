@@ -1,0 +1,17 @@
+{
+  "short_name": "Wika News",
+  "name": "Wika News | ويكا نيوز",
+  "icons": [
+    {
+      "src": "Picsart_26-01-20_05-35-29-021.png",
+      "type": "image/png",
+      "sizes": "1024x1024"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#1a1a1a",
+  "display": "standalone",
+  "theme_color": "#e74c3c",
+  "dir": "rtl",
+  "lang": "ar"
+}
